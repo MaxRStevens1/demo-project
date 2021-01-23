@@ -185,14 +185,6 @@ public class GraphicsDriver implements KeyListener {
 
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-
-	}
-
-	/**
-	 * gets input for keys when focused on panel, and pushes them, and a
-	 * arbitariarly chosen number to gameDriver to handel what happens with keypress
-	 */
-	public void keyReleased(KeyEvent e) {
 		int key = e.getKeyCode();
 		/*
 		 * Movement based on numpad
@@ -233,6 +225,14 @@ public class GraphicsDriver implements KeyListener {
 			game.moveSelector(9);
 			break;
 		}
+	}
+
+	/**
+	 * gets input for keys when focused on panel, and pushes them, and a
+	 * arbitariarly chosen number to gameDriver to handel what happens with keypress
+	 */
+	public void keyReleased(KeyEvent e) {
+
 
 	}
 }

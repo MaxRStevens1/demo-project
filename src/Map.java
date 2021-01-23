@@ -75,7 +75,7 @@ public class Map {
 	 * calls populate level
 	 */
 	public void setUpMap() {
-		 InputStream fstream = this.getClass().getResourceAsStream("MainRoom1.txt" );
+		InputStream fstream = this.getClass().getResourceAsStream("MainRoom1.txt");
 		Room room = new Room(fstream);
 		int rXAdd = x / 2 - room.x / 2 - 1;
 		int rYAdd = y / 2 - room.x / 2 - 1;
@@ -163,7 +163,7 @@ public class Map {
 	 *                   continous and not disjointed
 	 * @return
 	 */
-	public ArrayList<DoorTile> roomStamper(int midX, int midY, Room room, DoorTile parentDoor) {
+	public ArrayList<DoorTile> roomStamper(int midX, int midY, Room room, DoorTile partnertDoor) {
 		int rXAdd = midX - room.x / 2 - 1;
 		int rYAdd = midY - room.x / 2 - 1;
 		if (rXAdd >= x || rXAdd < 0 || rYAdd >= y || rYAdd < 0) {
@@ -176,7 +176,7 @@ public class Map {
 				Tile mapTile = getTile(startX + rXAdd, startY + rYAdd);
 				if (mapTile != null && !mapTile.canWalk) {
 					if (roomTile instanceof DoorTile) {
-						parentDoor.partner = (DoorTile) roomTile;
+						partnertDoor.partner = (DoorTile) roomTile;
 						localDoorList.add((DoorTile) roomTile);
 						hallWayCreator.add((DoorTile) roomTile);
 					}
@@ -227,12 +227,14 @@ public class Map {
 			for (int i = 0; i < adjacentTiles.length; i++) {
 				Tile adjacentTile = adjacentTiles[i];
 				if (adjacentTile != null && !closedTiles.contains(adjacentTile)) {
-					int newCostToAdjacentFVal = movementDistance(adjacentTile, startDoor)
-							+ movementDistance(endDoor, adjacentTile);
-					if (newCostToAdjacentFVal <= currentOpenFVal && !openTiles.contains(adjacentTile)) {
-						adjacentTile.parent = openTile;
-						openTiles.add(adjacentTile);
-					}
+					//if (!(adjacentTile instanceof GroundTile) || adjacentTile == endDoor) {
+						int newCostToAdjacentFVal = movementDistance(adjacentTile, startDoor)
+								+ movementDistance(endDoor, adjacentTile);
+						if (newCostToAdjacentFVal <= currentOpenFVal && !openTiles.contains(adjacentTile)) {
+							adjacentTile.parent = openTile;
+							openTiles.add(adjacentTile);
+						}
+					//}
 				}
 
 			}
@@ -340,9 +342,10 @@ public class Map {
 		String roomName = GameConstants.ROOM_NAMES[roomSelectedIndex][0];
 		String roomNumber = GameConstants.ROOM_NAMES[roomSelectedIndex][1];
 
-		//System.out.println(new File("rooms/" + roomName + roomNumber + ".txt").getAbsolutePath());
-	    InputStream fstream = this.getClass().getResourceAsStream(roomName + roomNumber + ".txt");
-	    Scanner scan = new Scanner(fstream);
+		// System.out.println(new File("rooms/" + roomName + roomNumber +
+		// ".txt").getAbsolutePath());
+		InputStream fstream = this.getClass().getResourceAsStream(roomName + roomNumber + ".txt");
+		Scanner scan = new Scanner(fstream);
 		return new Room(fstream);
 	}
 
