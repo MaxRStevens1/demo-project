@@ -5,13 +5,15 @@ public class GameDriver {
 	private Player player;
 	private ArrayList entityTracker;
 	private GraphicsDriver graph;
+	private Dungeon dungeon;
 
 	/**
 	 * constructor
 	 */
 	public GameDriver() {
 		player = new Player();
-		map = new Map(GameConstants.X_MAP_SIZE, GameConstants.Y_MAP_SIZE, player);
+		dungeon = new Dungeon(GameConstants.X_MAP_SIZE, GameConstants.Y_MAP_SIZE, player);
+		map = dungeon.getMap();
 	}
 
 	/**
