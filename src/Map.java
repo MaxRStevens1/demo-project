@@ -86,6 +86,9 @@ public class Map {
 		Room room = new Room(fstream);
 		int rXAdd = x / 2 - room.xLength / 2 - 1;
 		int rYAdd = y / 2 - room.xLength / 2 - 1;
+		
+		pointPairs.add(new PointPair(rXAdd, rYAdd, rXAdd + room.xLength, +rYAdd + room.yLength));
+		
 
 		for (int startY = 0; startY < room.yLength; startY++) {
 			for (int startX = 0; startX < room.xLength; startX++) {
