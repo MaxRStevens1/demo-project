@@ -5,20 +5,21 @@ public class GameDriver {
 	private Player player;
 	private ArrayList entityTracker;
 	private GraphicsDriver graph;
+	private Dungeon dungeon;
 
 	/**
 	 * constructor
 	 */
 	public GameDriver() {
 		player = new Player();
-		map = new Map(GameConstants.X_MAP_SIZE, GameConstants.Y_MAP_SIZE, player);
+		dungeon = new Dungeon(GameConstants.X_MAP_SIZE, GameConstants.Y_MAP_SIZE, player);
+		map = dungeon.getMap();
 	}
 
 	/**
 	 * basic map intialization, read map to for more detailed explanation
 	 */
 	public void intializeMap() {
-		map.populateLevel();
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class GameDriver {
 	 * @return boolean if player can walk to the tile, and its not oob
 	 */
 	private boolean isTileValidForPlayerToWalk(int x, int y) {
-		if(x >= 0 && x <= map.x && y >= 0 && y <= map.y) {
+		if(x >= 0 && x < map.x && y >= 0 && y < map.y) {
 			return map.getTile(x, y).canWalk || player.isFreeCam;
 		} 
 		return false;

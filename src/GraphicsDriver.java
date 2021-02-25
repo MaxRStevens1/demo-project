@@ -6,6 +6,7 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -68,7 +69,7 @@ public class GraphicsDriver implements KeyListener {
 		JScrollPane scrollText = new JScrollPane(outputText);
 
 		tilePane.add(scrollText);
-		// tilePane.add(outputText); new comment
+		// tilePane.add(outputText);
 		tilePane.add(inputText);
 
 		outputText.setText(outputText.getText()
@@ -183,8 +184,11 @@ public class GraphicsDriver implements KeyListener {
 	public void keyTyped(KeyEvent e) {
 	}
 
+	/**
+	 * gets input for keys when focused on panel, and pushes them, and a
+	 * arbitariarly chosen number to gameDriver to handel what happens with keypress
+	 */
 	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
 		int key = e.getKeyCode();
 		/*
 		 * Movement based on numpad
@@ -225,14 +229,13 @@ public class GraphicsDriver implements KeyListener {
 			game.moveSelector(9);
 			break;
 		}
-	}
-
-	/**
-	 * gets input for keys when focused on panel, and pushes them, and a
-	 * arbitariarly chosen number to gameDriver to handel what happens with keypress
-	 */
-	public void keyReleased(KeyEvent e) {
-
 
 	}
+
+/*
+ * 				
+ */
+
+	public void keyReleased(KeyEvent e) { }
+
 }

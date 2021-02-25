@@ -6,28 +6,27 @@ import java.util.Scanner;
 
 public class Room {
 	ArrayList<ArrayList<Tile>> room;
-	int x;
-	int y;
+	int xLength;
+	int yLength;
 
 	/**
 	 * room constructor
+	 * 
 	 * @param fstream file to make into room
 	 */
 	public Room(InputStream fstream) {
 		room = new ArrayList<ArrayList<Tile>>();
-		Scanner scan;
-		x = 0;
-		y = 0;
-		scan = new Scanner(fstream);
+		Scanner scan  = new Scanner(fstream);
+		xLength = 0;
+		yLength = 0;
 		constructRoom(scan);
+
 	}
 
 	/**
-	 * builds room from text file,
-	 * x = groundTile
-	 * W = wallTile
-	 * D = doorTile
-	 * p = player in a groundTile
+	 * builds room from text file, x = groundTile W = wallTile D = doorTile p =
+	 * player in a groundTile
+	 * 
 	 * @param scan
 	 */
 	public void constructRoom(Scanner scan) {
@@ -48,8 +47,8 @@ public class Room {
 				}
 			}
 		}
-		y = room.size();
-		x = room.get(0).size();
+		yLength = room.size();
+		xLength = room.get(0).size();
 	}
 
 	public Tile getTile(int x, int y) {
