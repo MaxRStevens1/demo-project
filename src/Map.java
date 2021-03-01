@@ -13,8 +13,8 @@ public class Map {
 														// the original 4 doorTiles in player room but am not going to
 														// refactor that code
 	private Queue<DoorTile> doorList;
-	public LinkedList<DoorTile> hallWayCreator;
-
+	private LinkedList<DoorTile> hallWayCreator;
+	private ArrayList<DoorTile> doorListDeBugger = new ArrayList<DoorTile>();
 	private ArrayList<PointPair> pointPairs = new ArrayList<PointPair>();
 
 	boolean isFirstFloor;
@@ -84,16 +84,10 @@ public class Map {
 	public void setUpMap() {
 		InputStream fstream = this.getClass().getResourceAsStream("MainRoom1.txt");
 		Room room = new Room(fstream);
-		int rXAdd = x / 2 - room.xLength / 2 - 1;
+		int rXAdd = x / 2 - room.xLength / 2 - 1; // places intial room in roughly the center of the map
 		int rYAdd = y / 2 - room.xLength / 2 - 1;
-<<<<<<< HEAD
 
 		pointPairs.add(new PointPair(rXAdd, rYAdd, rXAdd + room.xLength, +rYAdd + room.yLength));
-=======
-		
-		pointPairs.add(new PointPair(rXAdd, rYAdd, rXAdd + room.xLength, +rYAdd + room.yLength));
-		
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 
 		for (int startY = 0; startY < room.yLength; startY++) {
 			for (int startX = 0; startX < room.xLength; startX++) {
@@ -101,6 +95,7 @@ public class Map {
 				if (tile instanceof DoorTile) {
 					// door list is used in pathfinding
 					doorList.add((DoorTile) tile);
+					doorListDeBugger.add((DoorTile) tile);
 					playerStartingRoomDoorList.add((DoorTile) tile);
 				}
 				if (tile.player != null) {
@@ -113,19 +108,17 @@ public class Map {
 			}
 		}
 		populateLevel();
-		// necessary as you are popping and polling
-		int hallWayCreatorSize = playerStartingRoomDoorList.size();
-		// iterates through the hallwaycreator connecting the first and last element
+		
+		// loops through the hallwaycreator connecting the first and last element
 		// through a* in roomconnecter, and stamping the ground to moveable tile in
 		// groundstamp
-		for (int i = 0; i < hallWayCreatorSize; i++) {
+		while(playerStartingRoomDoorList.size() > 0) {
 			DoorTile t = playerStartingRoomDoorList.poll();
 			while (t.partner != null) {
 				groundStampForPathHelper(roomConnector(t, t.partner));
 				t = t.partner;
 			}
 		}
-
 	}
 
 	/**
@@ -138,33 +131,32 @@ public class Map {
 		while (doorList.size() != 0) {
 			Room room = roomSelector();
 			DoorTile door = (DoorTile) doorList.poll();
-			int signVal = Math.round((long) Math.random()); // needs to be either 0 or 2
+			int signVal = 0; // set to either -1 or 1
 			if (Math.random() >= .5) {
 				signVal = 1;
 			} else {
 				signVal = -1;
 			}
+			// bit strange math, but just takes random, multipless it by a RANDOM_? constant, and multiplies it by 1 or -1
 			int newDoorX = (int) (door.x + ((Math.random() + 1) * GameConstants.RANDOM_X_DISTANCE) * signVal);
+			
+			
 			if (Math.random() >= .5) {
 				signVal = 1;
 			} else {
 				signVal = -1;
 			}
-			int newDoorY = (int) (door.y + ((Math.random() + 1) * GameConstants.RANDOM_Y_DISTANCE) * signVal);
+			int newDoorY = (int) (door.y + ((Math.random() + 1) * GameConstants.RANDOM_Y_DISTANCE) * signVal); 
+			
+			
 			// prospective pointVal for door
-			PointPair pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, +newDoorY + room.yLength);
-<<<<<<< HEAD
+			PointPair pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, newDoorY + room.yLength);
 			int roomPlacementIters = 0;
 			while (!validRoomPlacement(pair, room.xLength) && roomPlacementIters < 5) {
-=======
-			while (!validRoomPlacement(pair, room.xLength)) {
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 				if (Math.random() >= .5) {
 					signVal = 1;
 				} else {
 					signVal = -1;
-<<<<<<< HEAD
-=======
 				}
 				newDoorX = (int) (door.x + ((Math.random() + 1) * GameConstants.RANDOM_X_DISTANCE) * signVal);
 				if (Math.random() >= .5) {
@@ -173,28 +165,13 @@ public class Map {
 					signVal = -1;
 				}
 				newDoorY = (int) (door.y + ((Math.random() + 1) * GameConstants.RANDOM_Y_DISTANCE) * signVal);
-				pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, +newDoorY + room.yLength);
-			}
-			pointPairs.add(pair);
-
-			ArrayList<DoorTile> localDoorList = roomStamper(newDoorX, newDoorY, room, door);
-			if (localDoorList != null) {
-				for (int x = 0; x < localDoorList.size(); x++) {
-					doorList.add(localDoorList.get(x));
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
-				}
-				newDoorX = (int) (door.x + ((Math.random() + 1) * GameConstants.RANDOM_X_DISTANCE) * signVal);
-				if (Math.random() >= .5) {
-					signVal = 1;
-				} else {
-					signVal = -1;
-				}
-				newDoorY = (int) (door.y + ((Math.random() + 1) * GameConstants.RANDOM_Y_DISTANCE) * signVal);
-				pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, +newDoorY + room.yLength);
-				if (roomPlacementIters >= 5) {
-					pair = null;
-				}
+				pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, newDoorY + room.yLength);
 				roomPlacementIters++;
+			}
+			
+			// 
+			if (roomPlacementIters >= 5) {
+				pair = null;
 			}
 			if (pair != null) {
 				pointPairs.add(pair);
@@ -203,9 +180,8 @@ public class Map {
 				if (i < 50) {
 					ArrayList<DoorTile> localDoorList = roomStamper(newDoorX, newDoorY, room, door);
 					if (localDoorList != null) {
-						for (int x = 0; x < localDoorList.size(); x++) {
-							doorList.add(localDoorList.get(x));
-						}
+							doorList.add(door.partner);
+							doorListDeBugger.add(door.partner);
 					}
 				} else {
 					return;
@@ -215,21 +191,10 @@ public class Map {
 			}
 			i++;
 		}
-		
 
-	}
-
-	public boolean validRoomPlacement(PointPair p, int roomSize) {
-		for (int i = 0; i < pointPairs.size(); i++) {
-			if (p.liesWithin(pointPairs.get(i), roomSize)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
-<<<<<<< HEAD
 	 * Helper method for checking if a point lies within another room
 	 * 
 	 * @param p        potetial new rooms point to be checked against all others
@@ -237,7 +202,8 @@ public class Map {
 	 * @return t if point p is not within another room f if it is
 	 */
 	public boolean validRoomPlacement(PointPair p, int roomSize) {
-		if (p.x2 >= x - 1 || p.y2 >= y - 1) {
+		if (p.x2 >= x - 1 || p.y2 >= y - 1 
+				|| p.x1 <= 1 || p.y1 <= 1) {
 			return false;
 		}
 		for (int i = 0; i < pointPairs.size(); i++) {
@@ -249,8 +215,6 @@ public class Map {
 	}
 
 	/**
-=======
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 	 * starts creating a room in the map, on midX - room.xLength / 2 - 1, and
 	 * overwrites the tile at that position to the corresponding tile in the room
 	 * 
@@ -262,39 +226,32 @@ public class Map {
 	 *                   continous and not disjointed
 	 * @return
 	 */
-<<<<<<< HEAD
 	public ArrayList<DoorTile> roomStamper(int midX, int midY, Room room, DoorTile partnerDoor) {
-=======
-	public ArrayList<DoorTile> roomStamper(int midX, int midY, Room room, DoorTile partnertDoor) {
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 		int rXAdd = midX - room.xLength / 2 - 1;
 		int rYAdd = midY - room.xLength / 2 - 1;
 		if (rXAdd >= x || rXAdd < 0 || rYAdd >= y || rYAdd < 0) {
 			return null;
 		}
+		
 		ArrayList<DoorTile> localDoorList = new ArrayList<DoorTile>();
 		for (int startY = 0; startY < room.yLength; startY++) {
 			for (int startX = 0; startX < room.xLength; startX++) {
 				Tile roomTile = room.getTile(startX, startY);
 				Tile mapTile = getTile(startX + rXAdd, startY + rYAdd);
 				if (mapTile != null && !mapTile.canWalk) {
+					setTile(startX + rXAdd, startY + rYAdd, roomTile);
 					if (roomTile instanceof DoorTile) {
 						partnerDoor.partner = (DoorTile) roomTile;
 						localDoorList.add((DoorTile) roomTile);
 						hallWayCreator.add((DoorTile) roomTile);
 					}
-					setTile(startX + rXAdd, startY + rYAdd, roomTile);
 				}
 			}
 		}
-<<<<<<< HEAD
 		// gets a partially random door from the local door list.
 		if (localDoorList.size() > 0) {
 			partnerDoor.partner = localDoorList.get(midX % localDoorList.size());
 		}
-=======
-
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 		return localDoorList;
 	}
 
@@ -337,13 +294,8 @@ public class Map {
 			Tile[] adjacentTiles = childrenRoomConnectorHelper(openTile);
 			for (int i = 0; i < adjacentTiles.length; i++) {
 				Tile adjacentTile = adjacentTiles[i];
-<<<<<<< HEAD
 				if (adjacentTile != null && !closedTiles.contains(adjacentTile)
 						&& !(adjacentTile instanceof DoorTile)) {
-=======
-			if (adjacentTile != null && !closedTiles.contains(adjacentTile) && !(adjacentTile instanceof DoorTile)
-				) {
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 					// if (!adjacentTile.canWalk || adjacentTile == endDoor) {
 					int newCostToAdjacentFVal = movementDistance(adjacentTile, startDoor)
 							+ movementDistance(endDoor, adjacentTile);
@@ -352,22 +304,14 @@ public class Map {
 						openTiles.add(adjacentTile);
 					}
 					// }
-<<<<<<< HEAD
 				} else if (adjacentTile == endDoor) {
-=======
-				} else if(adjacentTile == endDoor) {
->>>>>>> 36658c5f4ee889a13589d97e64078c4c58beb2f1
 					adjacentTile.parent = openTile;
 					openTiles.add(adjacentTile);
-					return roomPathMakerHelper(endDoor);
+					return roomPathMakerHelper(endDoor); // creates an stack of tiles to easily parse through
 				}
 
 			}
 		}
-		/*
-		 * for(int i = 0; i < openTiles.size(); i++) { System.out.println("X "
-		 * +openTiles.get(i).x +" Y " + openTiles.get(i).y); }
-		 */
 		return null;
 
 	}
@@ -419,8 +363,6 @@ public class Map {
 	 */
 	private Tile[] childrenRoomConnectorHelper(Tile t) {
 		Tile[] children = new Tile[4];
-		// mapXYVis();
-		// System.out.println("X: " + t.x + " Y:" + t.y);
 
 		if (t.x + 1 != x) {
 			children[0] = map[t.x + 1][t.y];
