@@ -8,17 +8,23 @@ public class Room {
 	ArrayList<ArrayList<Tile>> room;
 	int xLength;
 	int yLength;
+	// name and number of selected room string
+	String roomName;
+	String roomNumber;
 
 	/**
 	 * room constructor
 	 * 
 	 * @param fstream file to make into room
 	 */
-	public Room(InputStream fstream) {
+	public Room(InputStream fstream, String roomName, String roomNumber) {
 		room = new ArrayList<ArrayList<Tile>>();
 		Scanner scan  = new Scanner(fstream);
 		xLength = 0;
 		yLength = 0;
+		
+		this.roomName = roomName;
+		this.roomNumber = roomNumber;
 		constructRoom(scan);
 
 	}
@@ -42,6 +48,10 @@ public class Room {
 					room.get(room.size() - 1).add(new DoorTile(-1, -1));
 				} else if (row.substring(i, i + 1).equals("P")) {
 					room.get(room.size() - 1).add(new GroundTile(-1, -1, new Player()));
+				} else if(row.substring(i, i + 1).equals("d")) { // d for downstair
+					room.get(room.size() - 1).add(new DownStairTile(-1,-1));
+				} else if(row.substring(i, i + 1).equals("u")) { // u for upstair
+					room.get(room.size() - 1).add(new UpStairTile(-1,-1));
 				} else {
 					System.out.println("?? symbol not found in room text file");
 				}

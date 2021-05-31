@@ -6,6 +6,7 @@ public class Player extends Entity {
 	int mana;
 	int level;
 	int experience;
+	int currentMapLevel;
 
 	// when caps lock is pressed, camera is centered around capX and capY but player
 	// is not takening a turn
@@ -38,6 +39,7 @@ public class Player extends Entity {
 		hasClass = false;
 		isFreeCam = false;
 		tile = null;
+		currentMapLevel = 0;
 	}
 
 	public Player() {

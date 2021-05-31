@@ -24,6 +24,7 @@ public class TilePanel extends JPanel {
 
 	public void setMap(Map map) {
 		this.map = map;
+		repaint();
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -36,17 +37,19 @@ public class TilePanel extends JPanel {
 		}
 		// what it does is uses the players pos - constants to have the player always in
 		// the center of the displayed screen
+		boolean hasPlayerBeenSeenBefore = false;
 		for (int y = pY - GameConstants.PLAYER_VIEW_DISTANCE; y < pY + GameConstants.PLAYER_VIEW_DISTANCE; y++) {
 			for (int x = pX - GameConstants.PLAYER_VIEW_DISTANCE; x < pX + GameConstants.PLAYER_VIEW_DISTANCE; x++) {
 				Tile t = map.getTile(x, y);
 				if (t != null) {
 					// long and complicated drawing, but what it ends up doing is drawing a 16x16
-					// grid centered around the player charecter
+					// grid centered around the player character
 					g.drawImage(t.image, (x - pX + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
 							(y - pY + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X, TILE_SIZE,
 							TILE_SIZE, this);
-					if (t.player != null) {
-						g.drawImage(t.player.image,
+					// draws player at position if the tiles x / y matches the player
+					if (t.x == map.player.x && t.y == map.player.y) {
+						g.drawImage(map.player.image,
 								(x - pX + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
 								(y - pY + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
 								TILE_SIZE, TILE_SIZE, this);

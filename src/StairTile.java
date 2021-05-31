@@ -5,6 +5,6 @@ public class StairTile extends GroundTile {
 
 	public StairTile(int x, int y) {
 		super(x, y);
-		image = new ImageIcon(this.getClass().getResource("TileGround.png")).getImage();
+		image = new ImageIcon(this.getClass().getResource("TileFloor.png")).getImage();
 	}
 }

@@ -1,7 +1,6 @@
 import javax.swing.ImageIcon;
 
-public class DownStairTile extends GroundTile {
-	StairTile partner; // the stair tile that connects the upstair and the downstair
+public class DownStairTile extends StairTile {
 
 	public DownStairTile(int x, int y) {
 		super(x, y);

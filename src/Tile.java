@@ -27,7 +27,7 @@ public class Tile
    */
   public int getF() {return g + h;}
   
-	public String toString() {
-		return "(" + x + ", " + y + ")";
-	}
+	//public String toString() {
+	//	return "(" + x + ", " + y + ")";
+	//}
 }

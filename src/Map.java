@@ -14,10 +14,18 @@ public class Map {
 														// refactor that code
 	private Queue<DoorTile> doorList;
 	private LinkedList<DoorTile> hallWayCreator;
-	private ArrayList<DoorTile> doorListDeBugger = new ArrayList<DoorTile>();
-	private ArrayList<PointPair> pointPairs = new ArrayList<PointPair>();
-
+	
+	private Stack<UpStairTile> upStairStack;
+	private Stack<DownStairTile> downStairStack;
+	
+	private ArrayList<PointPair> pointPairs;
+	
+	//private arrayList<UpStairTile> upStairList;
+	
+	// bool to see if map needs to be reset and regen'd
+	boolean hasMapGenFailed;
 	boolean isFirstFloor;
+	boolean hasFinishedGen;
 
 	/**
 	 * Constuctor
@@ -26,19 +34,29 @@ public class Map {
 	 * @param y      maximum y length of map
 	 * @param player player to put in map
 	 */
-	public Map(int x, int y, Player player, boolean isFirstFloor) {
+	public Map(int x, int y, Player player, boolean isFirstFloor, Boolean hasMapGenFailed) {
 		map = new Tile[x][y];
 		doorList = new LinkedList<DoorTile>();
 		hallWayCreator = new LinkedList<DoorTile>();
 		playerStartingRoomDoorList = new LinkedList<DoorTile>();
+		pointPairs = new ArrayList<PointPair>();
+		downStairStack = new Stack<DownStairTile>();
+		hasFinishedGen = false;
+		if(!isFirstFloor) {
+			upStairStack = new Stack<UpStairTile>();
+		}
+		
 		this.x = x;
 		this.y = y;
 		this.player = player;
 		// checks if it is the first level
 		this.isFirstFloor = isFirstFloor;
+		
+		//hasMapGenFailed = true;
 
 		IntializaeMap();
 		setUpMap();
+		
 	}
 
 	/**
@@ -77,59 +95,110 @@ public class Map {
 	}
 
 	/**
-	 * Sets up and creams the starting floor, first it creates the intial room then
+	 * Sets up and creates the starting floor, first it creates the intial room then
 	 * calls populate level, and handles the main loop for connecting doors to each
 	 * other
 	 */
 	public void setUpMap() {
-		InputStream fstream = this.getClass().getResourceAsStream("MainRoom1.txt");
-		Room room = new Room(fstream);
-		int rXAdd = x / 2 - room.xLength / 2 - 1; // places intial room in roughly the center of the map
-		int rYAdd = y / 2 - room.xLength / 2 - 1;
-
-		pointPairs.add(new PointPair(rXAdd, rYAdd, rXAdd + room.xLength, +rYAdd + room.yLength));
-
-		for (int startY = 0; startY < room.yLength; startY++) {
-			for (int startX = 0; startX < room.xLength; startX++) {
-				Tile tile = room.getTile(startX, startY);
-				if (tile instanceof DoorTile) {
-					// door list is used in pathfinding
-					doorList.add((DoorTile) tile);
-					doorListDeBugger.add((DoorTile) tile);
-					playerStartingRoomDoorList.add((DoorTile) tile);
-				}
-				if (tile.player != null) {
-					tile.player = player;
-					player.x = startX + rXAdd;
-					player.y = startY + rYAdd;
-					player.tile = tile;
-				}
-				setTile(startX + rXAdd, startY + rYAdd, tile);
+			InputStream fstream; 
+			Room room;
+			if(isFirstFloor) {
+				fstream = this.getClass().getResourceAsStream("MainRoom1.txt");
+				room = new Room(fstream, "MainRoom", "1");
+			} else {
+				fstream = this.getClass().getResourceAsStream("StandardRoom1.txt");
+				room = new Room(fstream, "StandardRoom1", "1");
 			}
-		}
-		populateLevel();
+			int rXAdd = x / 2 - room.xLength / 2 - 1; // places intial room in roughly the center of the map
+			int rYAdd = y / 2 - room.xLength / 2 - 1;
+	
+			pointPairs.add(new PointPair(rXAdd, rYAdd, rXAdd + room.xLength, +rYAdd + room.yLength));
+	
+			for (int startY = 0; startY < room.yLength; startY++) {
+				for (int startX = 0; startX < room.xLength; startX++) {
+					Tile tile = room.getTile(startX, startY);
+					if (tile instanceof DoorTile) {
+						// door list is used in pathfinding
+						doorList.add((DoorTile) tile);
+						//doorListDeBugger.add((DoorTile) tile);
+						playerStartingRoomDoorList.add((DoorTile) tile);
+					}
+					if (tile.player != null && player == null) {
+						tile.player = player;
+						player.x = startX + rXAdd;
+						player.y = startY + rYAdd;
+						player.tile = tile;
+					}
+					setTile(startX + rXAdd, startY + rYAdd, tile);
+				}
+			}
 		
+		
+		// populatelevel has failed to generate the correct number of up / down stairs and now the map will be remade
+		int i = populateLevel();
+		//System.out.println("isPopulate Level Good: " + i);
+		// done to prevent an infinite loop on first floor generation
+		if(i != 0 || (!isFirstFloor && upStairStack.size() != GameConstants.NUM_UPSTAIR_ROOMS) 
+				|| downStairStack.size() != GameConstants.NUM_DOWNSTAIR_ROOMS) {
+			hasMapGenFailed = true;
+			return;
+		} else {
 		// loops through the hallwaycreator connecting the first and last element
 		// through a* in roomconnecter, and stamping the ground to moveable tile in
 		// groundstamp
-		while(playerStartingRoomDoorList.size() > 0) {
-			DoorTile t = playerStartingRoomDoorList.poll();
-			while (t.partner != null) {
-				groundStampForPathHelper(roomConnector(t, t.partner));
-				t = t.partner;
-			}
+			while(playerStartingRoomDoorList.size() > 0) {
+				DoorTile t = playerStartingRoomDoorList.poll();
+				while (t.partner != null) {
+					groundStampForPathHelper(roomConnector(t, t.partner));
+					t = t.partner;
+				}
+			} 
 		}
+
 	}
 
 	/**
 	 * decides where to put new rooms in levels, which is decided on a base offset
 	 * of RANDOM_X_DISTANCE and an addition random number between 0 and random base
-	 * offset
+	 * offset 
+	 * 
+	 * @return returns the added value of numUpstairs and numDownStairs, with an error condition if the added values are NOT 0
 	 */
-	public void populateLevel() {
+	public int populateLevel() {
 		int i = 0; // ITERATIONS of while loop below, done to prevent an infinite loop
+		// number of up and down stairs to place in the level
+		int numUpstairsToPlace = GameConstants.NUM_UPSTAIR_ROOMS;
+		// done as the first floor has no up to move too
+		if (isFirstFloor) {
+			numUpstairsToPlace = 0;
+		}
+		int numDownstairsToPlace = GameConstants.NUM_DOWNSTAIR_ROOMS;
+		
 		while (doorList.size() != 0) {
 			Room room = roomSelector();
+			// if room is an stairroomup, and stairroomdown, and it as not not first floor
+			if (room.roomName.equals("StairRoomUp") || room.roomName.equals("StairRoomDown")) {
+				if(numUpstairsToPlace == 0 && room.roomName.contains("StairRoomUp")) {
+					while(room.roomName.equals("StairRoomUp") || room.roomName.equals("StairRoomDown")) {
+						room = roomSelector();
+					}
+					//downstair sections
+				} else if(numDownstairsToPlace == 0 && room.roomName.contains("StairRoomDown")) {
+					while(room.roomName.equals("StairRoomDown") || room.roomName.equals("StairRoomUp") ) {
+						room = roomSelector();
+					}
+				}
+				
+				if(room.roomName.contains("StairRoomUp")) {
+					numUpstairsToPlace--;
+					//System.out.println("STAIRROOMSUP: " + numUpstairsToPlace);
+				}
+				else if(room.roomName.contains("StairRoomDown")) {
+					numDownstairsToPlace--;
+					//System.out.println("STAIRROOMSDOWN: " + numDownstairsToPlace);
+				}
+			}
+			
 			DoorTile door = (DoorTile) doorList.poll();
 			int signVal = 0; // set to either -1 or 1
 			if (Math.random() >= .5) {
@@ -137,7 +206,8 @@ public class Map {
 			} else {
 				signVal = -1;
 			}
-			// bit strange math, but just takes random, multipless it by a RANDOM_? constant, and multiplies it by 1 or -1
+			// bit strange math, but just takes random, multiples it by a constant, and multiplies it by 1 or -1
+			// randomly decided sign is to not have rooms gradually going right / up.
 			int newDoorX = (int) (door.x + ((Math.random() + 1) * GameConstants.RANDOM_X_DISTANCE) * signVal);
 			
 			
@@ -152,7 +222,8 @@ public class Map {
 			// prospective pointVal for door
 			PointPair pair = new PointPair(newDoorX, newDoorY, newDoorX + room.xLength, newDoorY + room.yLength);
 			int roomPlacementIters = 0;
-			while (!validRoomPlacement(pair, room.xLength) && roomPlacementIters < 5) {
+			while (!validRoomPlacement(pair, room.xLength)
+					&& roomPlacementIters < GameConstants.NUMBER_OF_ROOM_PLACEMENT_ATTEMPTS) {
 				if (Math.random() >= .5) {
 					signVal = 1;
 				} else {
@@ -169,29 +240,47 @@ public class Map {
 				roomPlacementIters++;
 			}
 			
-			// 
-			if (roomPlacementIters >= 5) {
+			// ending check, see if valid placement failed
+			if (roomPlacementIters >= GameConstants.NUMBER_OF_ROOM_PLACEMENT_ATTEMPTS) {
 				pair = null;
+				// check done to prevent map generation failing to generate proper number of rooms, 
+				// but returning a successful result
+				if(room.roomName.contains("StairRoomUp")) {
+					//System.out.println("Stair end attempt: Up");
+					numUpstairsToPlace++;
+				} else if (room.roomName.contains("StairRoomUp")) {
+					//System.out.println("IsStaironEndAttempt: Down");
+					numUpstairsToPlace++;
+				}
 			}
+			// if pair is valid, create a room centered around pointpair
 			if (pair != null) {
 				pointPairs.add(pair);
 				// creates a new list of doors from roomStamper, which creates and "stamps" a
 				// new room on the map
-				if (i < 50) {
+				if (i < 50 || (room.roomName.contains("StairRoom"))) {
 					ArrayList<DoorTile> localDoorList = roomStamper(newDoorX, newDoorY, room, door);
 					if (localDoorList != null) {
 							doorList.add(door.partner);
-							doorListDeBugger.add(door.partner);
+							//doorListDeBugger.add(door.partner);
 					}
+				// set of error conditions, if numUpstairs/downstairs are not 0, it means it will fail at floor connection in dungeon
+				// and map creation will be redone
 				} else {
-					return;
+					if (numUpstairsToPlace != 0 || numDownstairsToPlace != 0)
+						return -1;
+					return 0;
 				}
 			} else {
-				return;
+				if (numUpstairsToPlace != 0 || numDownstairsToPlace != 0)
+					return -1;
+				return 0;
 			}
 			i++;
 		}
-
+		if (numUpstairsToPlace != 0 || numDownstairsToPlace != 0)
+			return -1;
+		return 0;
 	}
 
 	/**
@@ -218,8 +307,8 @@ public class Map {
 	 * starts creating a room in the map, on midX - room.xLength / 2 - 1, and
 	 * overwrites the tile at that position to the corresponding tile in the room
 	 * 
-	 * @param midX       rough midpoint of room
-	 * @param midY       rough midpoint
+	 * @param midX       rough midpoint x cord of room 
+	 * @param midY       rough midpoint y cord
 	 * @param room       set of tiles that compose a room
 	 * @param parentDoor not to be confused with parent of a tile used in
 	 *                   pathfinding, this is done to make sure level stays
@@ -244,6 +333,13 @@ public class Map {
 						partnerDoor.partner = (DoorTile) roomTile;
 						localDoorList.add((DoorTile) roomTile);
 						hallWayCreator.add((DoorTile) roomTile);
+					} else if (roomTile instanceof UpStairTile) {
+						upStairStack.add((UpStairTile) roomTile);
+						//System.out.println("UpStairPlaced: " + upStairStack.size());
+					} else if (roomTile instanceof DownStairTile) {
+						downStairStack.add((DownStairTile) roomTile);
+						//System.out.println("DownStairPlaced: " + downStairStack.size());
+
 					}
 				}
 			}
@@ -285,25 +381,29 @@ public class Map {
 					openTileIndex = i;
 				}
 			}
+			// adds current tile to the closed list for comparisons, 
+			// and removes it from the open list
 			closedTiles.add(openTile);
 			openTiles.remove(openTileIndex);
-
+			
+			// exit condition
 			if (openTile == endDoor) {
 				return roomPathMakerHelper(endDoor);
 			}
+			
+			// gets a single tile rook movement of tiles around itself
 			Tile[] adjacentTiles = childrenRoomConnectorHelper(openTile);
 			for (int i = 0; i < adjacentTiles.length; i++) {
 				Tile adjacentTile = adjacentTiles[i];
 				if (adjacentTile != null && !closedTiles.contains(adjacentTile)
 						&& !(adjacentTile instanceof DoorTile)) {
-					// if (!adjacentTile.canWalk || adjacentTile == endDoor) {
 					int newCostToAdjacentFVal = movementDistance(adjacentTile, startDoor)
 							+ movementDistance(endDoor, adjacentTile);
 					if (newCostToAdjacentFVal <= currentOpenFVal && !openTiles.contains(adjacentTile)) {
 						adjacentTile.parent = openTile;
 						openTiles.add(adjacentTile);
 					}
-					// }
+					// exit condition
 				} else if (adjacentTile == endDoor) {
 					adjacentTile.parent = openTile;
 					openTiles.add(adjacentTile);
@@ -312,6 +412,7 @@ public class Map {
 
 			}
 		}
+		// failure condition
 		return null;
 
 	}
@@ -385,12 +486,12 @@ public class Map {
 	private void mapXYVis() {
 		for (int i = 0; i < map.length; i++) {
 			for (int x = 0; x < map[i].length; x++) {
-				System.out.print("X: " + map[x][i].x + " Y: " + map[x][i].y + ", ");
+				//System.out.print("X: " + map[x][i].x + " Y: " + map[x][i].y + ", ");
 				if (map[x][i].x != x || map[x][i].y != i) {
 					System.exit(0);
 				}
 			}
-			System.out.println();
+			//System.out.println();
 		}
 	}
 
@@ -400,21 +501,20 @@ public class Map {
 	}
 
 	/**
-	 * selects room randomly from aviable rooms using string concat for file name
+	 * selects room randomly from available rooms using string concat for file name
 	 * 
-	 * @return the room seelcted
+	 * @return the room selected
 	 */
 	public Room roomSelector() {
 		int roomSelectedIndex = (int) (Math.random() * GameConstants.ROOM_NAMES.length);
-		String roomName = GameConstants.ROOM_NAMES[roomSelectedIndex][0];
-		String roomNumber = GameConstants.ROOM_NAMES[roomSelectedIndex][1];
-
-		// System.out.println(new File("rooms/" + roomName + roomNumber +
-		// ".txt").getAbsolutePath());
+		String roomName = GameConstants.ROOM_NAMES[roomSelectedIndex][0]; // the first position of the room_name array is always the name
+		String roomNumber = GameConstants.ROOM_NAMES[roomSelectedIndex][1]; // the second position is always the #
+		
 		InputStream fstream = this.getClass().getResourceAsStream(roomName + roomNumber + ".txt");
-		return new Room(fstream);
+		return new Room(fstream, roomName, roomNumber);
 	}
-
+	
+	
 	/**
 	 * gets tile at pos x y
 	 * 
@@ -454,5 +554,19 @@ public class Map {
 	 */
 	public void setPlayer(Player player) {
 		this.player = player;
+	}
+	/**
+	 * 
+	 * @return upstairstack
+	 */
+	public Stack<UpStairTile> getUpStairStack() {
+		return upStairStack;
+	}
+	/**
+	 * 
+	 * @return downstairstack
+	 */
+	public Stack<DownStairTile> getDownStairStack() {
+		return downStairStack;
 	}
 }

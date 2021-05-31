@@ -18,6 +18,7 @@ public class GraphicsDriver implements KeyListener {
 	JLabel healthLabel;
 	JLabel manaLabel;
 	JLabel levelLabel;
+	JLabel floorLevelLabel;
 
 	JTextArea outputText;
 	JTextField inputText;
@@ -46,6 +47,7 @@ public class GraphicsDriver implements KeyListener {
 		healthLabel = new JLabel();
 		manaLabel = new JLabel();
 		levelLabel = new JLabel();
+		floorLevelLabel = new JLabel();
 
 		frame.setVisible(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -136,6 +138,7 @@ public class GraphicsDriver implements KeyListener {
 		tilePane.add(healthLabel);
 		tilePane.add(manaLabel);
 		tilePane.add(levelLabel);
+		tilePane.add(floorLevelLabel);
 
 		nameLabel.setLocation(600, 100);
 		nameLabel.setFont(new Font("Serif", Font.PLAIN, 18));
@@ -164,6 +167,13 @@ public class GraphicsDriver implements KeyListener {
 		levelLabel.setVisible(true);
 		levelLabel.setFocusable(false);
 		levelLabel.setForeground(Color.white);
+		
+		floorLevelLabel.setLocation(600, 160);
+		floorLevelLabel.setFont(new Font("Serif", Font.PLAIN, 18));
+		floorLevelLabel.setSize(400, 100);
+		floorLevelLabel.setVisible(true);
+		floorLevelLabel.setFocusable(false);
+		floorLevelLabel.setForeground(Color.white);
 	}
 
 	/**
@@ -174,11 +184,13 @@ public class GraphicsDriver implements KeyListener {
 		healthLabel.setText("HP: " + player.health);
 		manaLabel.setText("MP: " + player.mana);
 		levelLabel.setText("Level: " + player.level + " EXP: " + player.experience);
-
+		floorLevelLabel.setText("Layers in: " + player.currentMapLevel);
 	}
 
 	public void setMap(Map map) {
 		tilePane.setMap(map);
+		this.map = map;
+		floorLevelLabel.setText("Layers in: " + player.currentMapLevel);
 	}
 
 	public void keyTyped(KeyEvent e) {
@@ -200,7 +212,7 @@ public class GraphicsDriver implements KeyListener {
 		case KeyEvent.VK_NUMPAD1:
 			game.moveSelector(1);
 			break;
-		case KeyEvent.VK_DOWN:
+		case KeyEvent.VK_DOWN: // doesn't break so it just runs its sister command
 		case KeyEvent.VK_NUMPAD2:
 			game.moveSelector(2);
 			break;
@@ -221,20 +233,28 @@ public class GraphicsDriver implements KeyListener {
 		case KeyEvent.VK_NUMPAD7:
 			game.moveSelector(7);
 			break;
-		case KeyEvent.VK_UP:
+		case KeyEvent.VK_UP: 
 		case KeyEvent.VK_NUMPAD8:
 			game.moveSelector(8);
 			break;
 		case KeyEvent.VK_NUMPAD9:
 			game.moveSelector(9);
 			break;
+		//case KeyEvent.VK_PERIOD:
+		case KeyEvent.VK_PAGE_UP:
+		case GameConstants.GREATER_THAN_NUM: // is the > symbol
+			game.moveSelector(10); // number is arbitrary
+			updatePlayerText();
+			break;
+		//case KeyEvent.VK_COMMA:
+		case KeyEvent.VK_PAGE_DOWN:
+		case GameConstants.LESS_THAN_NUM: // is the < symbol
+			game.moveSelector(11);
+			updatePlayerText();
+			break;
 		}
 
 	}
-
-/*
- * 				
- */
 
 	public void keyReleased(KeyEvent e) { }
 
