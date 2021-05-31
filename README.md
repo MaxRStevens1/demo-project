@@ -6,11 +6,11 @@ Personal project turned into a tech demo of sorts. Contains a basic gui and some
 Download and run the jar file, no further set up needed!
 
 # Tips
-Welcome to a graphical, pathfinding, and gui demo.
+Welcome to an infinite level generation demo.
 
 Move around using a computer numpad or arrowkeys
 
-If your key presses are not registering, try clicking on the panel or pressing shift-tab
+If your key presses are not registering, try clicking on the panel and pressing shift-tab
 
 Movement is 8 directional, but there is no issue if you are using arrow keys
 
