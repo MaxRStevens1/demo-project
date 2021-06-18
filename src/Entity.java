@@ -5,7 +5,7 @@ public class Entity
   int x;
   int y;
   Image image;
-  
+  String name;
   
   public Entity(int x, int y) {
     this.x = x;

@@ -1,4 +1,5 @@
 import java.awt.Color;
+
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -6,7 +7,6 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -16,7 +16,6 @@ public class GraphicsDriver implements KeyListener {
 	TilePanel tilePane;
 	JLabel nameLabel;
 	JLabel healthLabel;
-	JLabel manaLabel;
 	JLabel levelLabel;
 	JLabel floorLevelLabel;
 
@@ -45,7 +44,6 @@ public class GraphicsDriver implements KeyListener {
 
 		nameLabel = new JLabel();
 		healthLabel = new JLabel();
-		manaLabel = new JLabel();
 		levelLabel = new JLabel();
 		floorLevelLabel = new JLabel();
 
@@ -71,7 +69,6 @@ public class GraphicsDriver implements KeyListener {
 		JScrollPane scrollText = new JScrollPane(outputText);
 
 		tilePane.add(scrollText);
-		// tilePane.add(outputText);
 		tilePane.add(inputText);
 
 		outputText.setText(outputText.getText()
@@ -129,6 +126,11 @@ public class GraphicsDriver implements KeyListener {
 		});
 		setUpPlayerInfo();
 	}
+	
+	
+	public void setNewText (String input) {
+		outputText.setText(outputText.getText() + "\n" + input);
+	}
 
 	/**
 	 * sudo refresh / intialization for player info
@@ -136,7 +138,6 @@ public class GraphicsDriver implements KeyListener {
 	public void setUpPlayerInfo() {
 		tilePane.add(nameLabel);
 		tilePane.add(healthLabel);
-		tilePane.add(manaLabel);
 		tilePane.add(levelLabel);
 		tilePane.add(floorLevelLabel);
 
@@ -153,13 +154,6 @@ public class GraphicsDriver implements KeyListener {
 		healthLabel.setVisible(true);
 		healthLabel.setFocusable(false);
 		healthLabel.setForeground(Color.white);
-
-		manaLabel.setLocation(650, 120);
-		manaLabel.setFont(new Font("Serif", Font.PLAIN, 18));
-		manaLabel.setSize(200, 100);
-		manaLabel.setVisible(true);
-		manaLabel.setFocusable(false);
-		manaLabel.setForeground(Color.white);
 
 		levelLabel.setLocation(600, 140);
 		levelLabel.setFont(new Font("Serif", Font.PLAIN, 18));
@@ -181,8 +175,7 @@ public class GraphicsDriver implements KeyListener {
 	 * changed
 	 */
 	public void updatePlayerText() {
-		healthLabel.setText("HP: " + player.health);
-		manaLabel.setText("MP: " + player.mana);
+		healthLabel.setText("HP: " + player.health + "   MP: " + player.mana);
 		levelLabel.setText("Level: " + player.level + " EXP: " + player.experience);
 		floorLevelLabel.setText("Layers in: " + player.currentMapLevel);
 	}

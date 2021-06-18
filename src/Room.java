@@ -1,5 +1,3 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -11,11 +9,12 @@ public class Room {
 	// name and number of selected room string
 	String roomName;
 	String roomNumber;
-
 	/**
 	 * room constructor
 	 * 
 	 * @param fstream file to make into room
+	 * @param roomName name of the room
+	 * @param roomNumber number of the room
 	 */
 	public Room(InputStream fstream, String roomName, String roomNumber) {
 		room = new ArrayList<ArrayList<Tile>>();
@@ -32,7 +31,7 @@ public class Room {
 	/**
 	 * builds room from text file, x = groundTile W = wallTile D = doorTile p =
 	 * player in a groundTile
-	 * 
+	 * also, if there is a ground tile, 1/8 chance of setting a MonsterSpawn flag
 	 * @param scan
 	 */
 	public void constructRoom(Scanner scan) {
@@ -41,7 +40,10 @@ public class Room {
 			room.add(new ArrayList<Tile>());
 			for (int i = 0; i < row.length(); i++) {
 				if (row.substring(i, i + 1).equals("x")) {
-					room.get(room.size() - 1).add(new GroundTile(-1, -1));
+					GroundTile t = new GroundTile(-1, -1);
+					room.get(room.size() - 1).add(t);
+					// sets flag to true at 1/8 chance
+					t.setMonsterFlag(Math.random() <= GameConstants.MONSTER_SPAWN_CHANCE);
 				} else if (row.substring(i, i + 1).equals("W")) {
 					room.get(room.size() - 1).add(new WallTile(-1, -1));
 				} else if (row.substring(i, i + 1).equals("D")) {

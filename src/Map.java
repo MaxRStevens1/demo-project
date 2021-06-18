@@ -82,6 +82,9 @@ public class Map {
 	/**
 	 * sets current tile at map position x y to tile t Also copies player over, and
 	 * sets player to new x y if there is a player at the input tile
+	 * @param x cord
+	 * @param y cord
+	 * @param t new Tile to set at map x/y cord 
 	 */
 	public void setTile(int x, int y, Tile t) {
 		map[x][y] = t;
@@ -91,6 +94,12 @@ public class Map {
 			player.x = x;
 			player.y = y;
 			player.tile = t;
+		}
+		if (t.enemy != null)
+		{
+			t.enemy.x = x;
+			t.enemy.y = y;
+			t.enemy.tile = t;
 		}
 	}
 
@@ -316,8 +325,8 @@ public class Map {
 	 * @return
 	 */
 	public ArrayList<DoorTile> roomStamper(int midX, int midY, Room room, DoorTile partnerDoor) {
-		int rXAdd = midX - room.xLength / 2 - 1;
-		int rYAdd = midY - room.xLength / 2 - 1;
+		int rXAdd = midX ;//- room.xLength / 2 - 1;
+		int rYAdd = midY ;//- room.xLength / 2 - 1;
 		if (rXAdd >= x || rXAdd < 0 || rYAdd >= y || rYAdd < 0) {
 			return null;
 		}
@@ -329,6 +338,10 @@ public class Map {
 				Tile mapTile = getTile(startX + rXAdd, startY + rYAdd);
 				if (mapTile != null && !mapTile.canWalk) {
 					setTile(startX + rXAdd, startY + rYAdd, roomTile);
+					// creates monster if flag is set
+					if (roomTile.monsterSpawnFlag)
+						roomTile.enemy = new Enemy (roomTile.x, roomTile.y);
+					
 					if (roomTile instanceof DoorTile) {
 						partnerDoor.partner = (DoorTile) roomTile;
 						localDoorList.add((DoorTile) roomTile);
@@ -396,7 +409,7 @@ public class Map {
 			for (int i = 0; i < adjacentTiles.length; i++) {
 				Tile adjacentTile = adjacentTiles[i];
 				if (adjacentTile != null && !closedTiles.contains(adjacentTile)
-						&& !(adjacentTile instanceof DoorTile)) {
+						&& (adjacentTile instanceof BuildTile || adjacentTile instanceof GroundTile)) {
 					int newCostToAdjacentFVal = movementDistance(adjacentTile, startDoor)
 							+ movementDistance(endDoor, adjacentTile);
 					if (newCostToAdjacentFVal <= currentOpenFVal && !openTiles.contains(adjacentTile)) {
@@ -447,7 +460,7 @@ public class Map {
 		if (path != null) {
 			while (path.size() > 0) {
 				Tile t = path.pop();
-				if (!t.canWalk) {
+				if (t instanceof BuildTile) {
 					setTile(t.x, t.y, new GroundTile(t.x, t.y, t.player));
 				}
 			}
@@ -509,8 +522,9 @@ public class Map {
 		int roomSelectedIndex = (int) (Math.random() * GameConstants.ROOM_NAMES.length);
 		String roomName = GameConstants.ROOM_NAMES[roomSelectedIndex][0]; // the first position of the room_name array is always the name
 		String roomNumber = GameConstants.ROOM_NAMES[roomSelectedIndex][1]; // the second position is always the #
-		
-		InputStream fstream = this.getClass().getResourceAsStream(roomName + roomNumber + ".txt");
+		// randomizes the number from 1 to itself
+		int nummberRandomized =  (int) Math.ceil(Math.random() * Integer.parseInt(roomNumber));
+		InputStream fstream = this.getClass().getResourceAsStream(roomName + nummberRandomized + ".txt");
 		return new Room(fstream, roomName, roomNumber);
 	}
 	
