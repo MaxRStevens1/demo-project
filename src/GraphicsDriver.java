@@ -15,8 +15,7 @@ public class GraphicsDriver implements KeyListener {
 	JFrame frame;
 	TilePanel tilePane;
 	JLabel nameLabel;
-	JLabel healthLabel;
-	JLabel levelLabel;
+	JLabel enemiesCrunchedLabel;
 	JLabel floorLevelLabel;
 
 	JTextArea outputText;
@@ -27,8 +26,8 @@ public class GraphicsDriver implements KeyListener {
 	GameDriver game;
 
 	/**
-	 * big old intializes monster, makes it so the various labels, panels, and
-	 * frames work nicely once intialization is done, runs gameGraphicSetUp
+	 * big old initializes monster, makes it so the various labels, panels, and
+	 * frames work nicely once initialization is done, runs gameGraphicSetUp
 	 * 
 	 * @param map
 	 * @param game
@@ -43,8 +42,7 @@ public class GraphicsDriver implements KeyListener {
 		inputText = new JTextField();
 
 		nameLabel = new JLabel();
-		healthLabel = new JLabel();
-		levelLabel = new JLabel();
+		enemiesCrunchedLabel = new JLabel();
 		floorLevelLabel = new JLabel();
 
 		frame.setVisible(true);
@@ -71,12 +69,14 @@ public class GraphicsDriver implements KeyListener {
 		tilePane.add(scrollText);
 		tilePane.add(inputText);
 
-		outputText.setText(outputText.getText()
-				+ "Welcome to a graphical, pathfinding, and gui demo,"
+		outputText.setText(outputText.getText() + "Welcome to M Explorer, a procedurally generated demo game"
 				+ "\nMove around using a computer numpad or arrowkeys"
-				+ "\nIf your key presses are not registering, try clicking on the panel and pressing shifttab"
-				+ "\nMovement is 8 directional, but there should be no issue if you are using arrow keys"
-				+ "\nIf you want to pan around the map without moving the charecter, press caps locks"
+				+ "\nIf your key presses are not registering, try clicking on the panel and pressing tab"
+				+ "\nMovement is done using num pad or arrow keys"
+				+ "\nIf you want to pan around the map without moving the charecter, press caps locks to enter free cam"
+				+ "\nThe tiles that are is not the standard wall, floor, or door is a stair tile!"
+				+ "\nThey can be used to ascend or descend the dungeon using >, <, or PageUp or PageDown"
+				+ "\nYour vision is in a circle with a radius of 8 tiles, if a tile is black that means you haven't seen it yet!"
 				+ "\nType h into the textbox below and press enter to see this message again."
 				+ "\nType c if you want to clear this textbox");
 
@@ -110,11 +110,14 @@ public class GraphicsDriver implements KeyListener {
 					}
 					if (inputText.getText().equals("h")) {
 						outputText.setText(outputText.getText() + "\n"
-								+ "Welcome to a graphical, pathfinding, and gui demo,"
+								+ "Welcome to M Explorer, a procedurally generated demo game"
 								+ "\nMove around using a computer numpad or arrowkeys"
-								+ "\nIf your key presses are not registering, try clicking on the panel and pressing shifttab"
-								+ "\nMovement is 8 directional, but there should be no issue if you are using arrow keys"
-								+ "\nIf you want to pan around the map without moving the charecter, press caps locks"
+								+ "\nIf your key presses are not registering, try clicking on the panel and pressing tab"
+								+ "\nMovement is done using num pad or arrow keys"
+								+ "\nIf you want to pan around the map without moving the charecter, press caps locks to enter free cam"
+								+ "\nThe tiles that are is not the standard wall, floor, or door is a stair tile!"
+								+ "\nThey can be used to ascend or descend the dungeon using >, <, or PageUp or PageDown"
+								+ "\nYour vision is in a circle with a radius of 8 tiles, if a tile is black that means you haven't seen it yet!"
 								+ "\nType h into the textbox below and press enter to see this message again."
 								+ "\nType c if you want to clear this textbox");
 					} else if (inputText.getText().equals("c")) {
@@ -126,9 +129,8 @@ public class GraphicsDriver implements KeyListener {
 		});
 		setUpPlayerInfo();
 	}
-	
-	
-	public void setNewText (String input) {
+
+	public void setNewText(String input) {
 		outputText.setText(outputText.getText() + "\n" + input);
 	}
 
@@ -137,32 +139,24 @@ public class GraphicsDriver implements KeyListener {
 	 */
 	public void setUpPlayerInfo() {
 		tilePane.add(nameLabel);
-		tilePane.add(healthLabel);
-		tilePane.add(levelLabel);
+		tilePane.add(enemiesCrunchedLabel);
 		tilePane.add(floorLevelLabel);
 
-		nameLabel.setLocation(600, 100);
+		nameLabel.setLocation(650, 100);
 		nameLabel.setFont(new Font("Serif", Font.PLAIN, 18));
 		nameLabel.setSize(300, 100);
 		nameLabel.setVisible(true);
 		nameLabel.setFocusable(false);
 		nameLabel.setForeground(Color.white);
 
-		healthLabel.setLocation(600, 120);
-		healthLabel.setFont(new Font("Serif", Font.PLAIN, 18));
-		healthLabel.setSize(200, 100);
-		healthLabel.setVisible(true);
-		healthLabel.setFocusable(false);
-		healthLabel.setForeground(Color.white);
+		enemiesCrunchedLabel.setLocation(640, 120);
+		enemiesCrunchedLabel.setFont(new Font("Serif", Font.PLAIN, 18));
+		enemiesCrunchedLabel.setSize(200, 100);
+		enemiesCrunchedLabel.setVisible(true);
+		enemiesCrunchedLabel.setFocusable(false);
+		enemiesCrunchedLabel.setForeground(Color.white);
 
-		levelLabel.setLocation(600, 140);
-		levelLabel.setFont(new Font("Serif", Font.PLAIN, 18));
-		levelLabel.setSize(400, 100);
-		levelLabel.setVisible(true);
-		levelLabel.setFocusable(false);
-		levelLabel.setForeground(Color.white);
-		
-		floorLevelLabel.setLocation(600, 160);
+		floorLevelLabel.setLocation(650, 140);
 		floorLevelLabel.setFont(new Font("Serif", Font.PLAIN, 18));
 		floorLevelLabel.setSize(400, 100);
 		floorLevelLabel.setVisible(true);
@@ -175,23 +169,30 @@ public class GraphicsDriver implements KeyListener {
 	 * changed
 	 */
 	public void updatePlayerText() {
-		healthLabel.setText("HP: " + player.health + "   MP: " + player.mana);
-		levelLabel.setText("Level: " + player.level + " EXP: " + player.experience);
 		floorLevelLabel.setText("Layers in: " + player.currentMapLevel);
+		enemiesCrunchedLabel.setText("Enemies Crunched: " + player.enemiesCrunched);
 	}
 
+	/**
+	 * Sets map in game driver to new map
+	 * 
+	 * @param map new map
+	 */
 	public void setMap(Map map) {
 		tilePane.setMap(map);
 		this.map = map;
 		floorLevelLabel.setText("Layers in: " + player.currentMapLevel);
 	}
 
+	/**
+	 * done to implement interface, unused
+	 */
 	public void keyTyped(KeyEvent e) {
 	}
 
 	/**
-	 * gets input for keys when focused on panel, and pushes them, and a
-	 * arbitariarly chosen number to gameDriver to handel what happens with keypress
+	 * gets input for keys when focused on panel, and pushes them, and a Arbitrarily
+	 * chosen number to GameDriver to handle what happens with key press
 	 */
 	public void keyPressed(KeyEvent e) {
 		int key = e.getKeyCode();
@@ -226,20 +227,20 @@ public class GraphicsDriver implements KeyListener {
 		case KeyEvent.VK_NUMPAD7:
 			game.moveSelector(7);
 			break;
-		case KeyEvent.VK_UP: 
+		case KeyEvent.VK_UP:
 		case KeyEvent.VK_NUMPAD8:
 			game.moveSelector(8);
 			break;
 		case KeyEvent.VK_NUMPAD9:
 			game.moveSelector(9);
 			break;
-		//case KeyEvent.VK_PERIOD:
+		// case KeyEvent.VK_PERIOD:
 		case KeyEvent.VK_PAGE_UP:
 		case GameConstants.GREATER_THAN_NUM: // is the > symbol
 			game.moveSelector(10); // number is arbitrary
 			updatePlayerText();
 			break;
-		//case KeyEvent.VK_COMMA:
+		// case KeyEvent.VK_COMMA:
 		case KeyEvent.VK_PAGE_DOWN:
 		case GameConstants.LESS_THAN_NUM: // is the < symbol
 			game.moveSelector(11);
@@ -249,6 +250,10 @@ public class GraphicsDriver implements KeyListener {
 
 	}
 
-	public void keyReleased(KeyEvent e) { }
+	/**
+	 * done to implement interface, unused
+	 */
+	public void keyReleased(KeyEvent e) {
+	}
 
 }

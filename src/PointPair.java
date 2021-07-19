@@ -10,7 +10,7 @@ public class PointPair {
 	int x1, x2, y1, y2;
 
 	/**
-	 * PointPairs for a room
+	 * PointPairs for a room, similar to a point but 2 sets of cordinate points
 	 * 
 	 * @param x1 x at room 0 with offset of map X
 	 * @param y1 y at room with offset of mapy
@@ -37,8 +37,7 @@ public class PointPair {
 	 * @return returns true if this PointPair lies within PointPair P
 	 */
 	public boolean liesWithin(PointPair p, int roomSize) {
-		return this.x1 <= p.x2 + 1 && this.x2 >= p.x1 - 1 
-				&& this.y1 <= p.y2 + 1 && this.y2 >= p.y1 - 1;
+		return this.x1 <= p.x2 + 1 && this.x2 >= p.x1 - 1 && this.y1 <= p.y2 + 1 && this.y2 >= p.y1 - 1;
 	}
 
 	public String toString() {

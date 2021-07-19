@@ -9,19 +9,20 @@ public class Room {
 	// name and number of selected room string
 	String roomName;
 	String roomNumber;
+
 	/**
 	 * room constructor
 	 * 
-	 * @param fstream file to make into room
-	 * @param roomName name of the room
+	 * @param fstream    file to make into room
+	 * @param roomName   name of the room
 	 * @param roomNumber number of the room
 	 */
 	public Room(InputStream fstream, String roomName, String roomNumber) {
 		room = new ArrayList<ArrayList<Tile>>();
-		Scanner scan  = new Scanner(fstream);
+		Scanner scan = new Scanner(fstream);
 		xLength = 0;
 		yLength = 0;
-		
+
 		this.roomName = roomName;
 		this.roomNumber = roomNumber;
 		constructRoom(scan);
@@ -30,8 +31,9 @@ public class Room {
 
 	/**
 	 * builds room from text file, x = groundTile W = wallTile D = doorTile p =
-	 * player in a groundTile
-	 * also, if there is a ground tile, 1/8 chance of setting a MonsterSpawn flag
+	 * player in a groundTile also, if there is a ground tile, 1/8 chance of setting
+	 * a MonsterSpawn flag
+	 * 
 	 * @param scan
 	 */
 	public void constructRoom(Scanner scan) {
@@ -50,10 +52,10 @@ public class Room {
 					room.get(room.size() - 1).add(new DoorTile(-1, -1));
 				} else if (row.substring(i, i + 1).equals("P")) {
 					room.get(room.size() - 1).add(new GroundTile(-1, -1, new Player()));
-				} else if(row.substring(i, i + 1).equals("d")) { // d for downstair
-					room.get(room.size() - 1).add(new DownStairTile(-1,-1));
-				} else if(row.substring(i, i + 1).equals("u")) { // u for upstair
-					room.get(room.size() - 1).add(new UpStairTile(-1,-1));
+				} else if (row.substring(i, i + 1).equals("d")) { // d for downstair
+					room.get(room.size() - 1).add(new DownStairTile(-1, -1));
+				} else if (row.substring(i, i + 1).equals("u")) { // u for upstair
+					room.get(room.size() - 1).add(new UpStairTile(-1, -1));
 				} else {
 					System.out.println("?? symbol not found in room text file");
 				}
@@ -63,6 +65,7 @@ public class Room {
 		xLength = room.get(0).size();
 	}
 
+	// getters and setters
 	public Tile getTile(int x, int y) {
 		return room.get(y).get(x);
 	}

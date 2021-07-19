@@ -9,24 +9,50 @@ public class TilePanel extends JPanel {
 	public static int TILE_SIZE = 32;
 	private Map map;
 
+	/**
+	 * part of the graphics engine of the game, its what creates the images on
+	 * screen
+	 * 
+	 * @param map
+	 */
 	public TilePanel(Map map) {
 		this.map = map;
 	}
 
+	/**
+	 * sets image at x/y map position
+	 * 
+	 * @param x     cord
+	 * @param y     cord
+	 * @param image new image
+	 */
 	public void setImage(int x, int y, Image image) {
 		map.getTile(x, y).image = image;
 		repaint();
 	}
 
+	/**
+	 * @return map
+	 */
 	public Map getMap() {
 		return map;
 	}
 
+	/**
+	 * sets map to new map
+	 * 
+	 * @param map new map
+	 */
 	public void setMap(Map map) {
 		this.map = map;
 		repaint();
 	}
 
+	/**
+	 * Refreshes screen when updated to display the new images based on an 8x8
+	 * sqaure around player, while also updating and providing info for player
+	 * vision
+	 */
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		int pX = map.player.x;
@@ -55,11 +81,12 @@ public class TilePanel extends JPanel {
 					}
 					// draws Enemies if enemy in tile is not null
 					if (t.enemy != null) {
-						g.drawImage(t.enemy.image, (x - pX + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
-								(y - pY + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X, TILE_SIZE,
-								TILE_SIZE, this);
+						g.drawImage(t.enemy.image,
+								(x - pX + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
+								(y - pY + GameConstants.PLAYER_VIEW_DISTANCE) * TILE_SIZE + BASE_MAP_OFFSET_X,
+								TILE_SIZE, TILE_SIZE, this);
 					}
-					
+
 				}
 			}
 		}
