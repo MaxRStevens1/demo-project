@@ -1,23 +1,25 @@
-# demo-project
-Personal project turned into a tech demo of sorts. Contains a basic gui and some cool pathfinding / level generation.
+# M Explorer
+Hello! This is an infintely exlporable, procedurally generated demo game.
 
 
-# Use
-Download and run the jar file, no further set up needed!
+# Usage
+Download and run the jar file, no further set up needed.
+
+Movement is done via arrow keys or numpad.
+
+In order to descend to another level, please us Page Down or the  < Key!
+In order to ascend to a previous level, please use Page Up or the > key!
+
+Enemys cannot hurt you, and you can damage them by 'stepping' into them
 
 # Tips
-Welcome to an infinite level generation demo.
 
 Move around using a computer numpad or arrowkeys
-
-If your key presses are not registering, try clicking on the panel and pressing shift-tab
-
-Movement is 8 directional, but there is no issue if you are using arrow keys
-
-If you want to pan around the map without moving the charecter, press caps locks
-
-When encoutering an set of stairs, you can press page down to descend into a new level, or page up to ascend to a previous level, depending on the stair type
-
-Type h into the bottom and press enter to see a help message similar to this one.
-
-Type c if you want to clear the textbox above the bottom textbox.
+If your key presses are not registering, try clicking on the panel and pressing tab
+Movement is done using num pad or arrow keys
+If you want to pan around the map without moving the charecter, press caps locks to enter free cam
+The tiles that are is not the standard wall, floor, or door is a stair tile!
+They can be used to ascend or descend the dungeon using >, <, or PageUp or PageDown.
+Your vision is in a circle with a radius of 8 tiles, if a tile is black that means you haven't seen it yet!
+Type h into the textbox in game and press enter to see this message again in game.
+Type c if you want to clear the in game textbox.
