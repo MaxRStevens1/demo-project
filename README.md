@@ -1,5 +1,5 @@
 # M Explorer
-Hello! This is an infintely exlporable, procedurally generated demo game.
+Hello! This is an infintely exlporable, procedurally generated demo game created by Max Stevens.
 
 
 # Usage
